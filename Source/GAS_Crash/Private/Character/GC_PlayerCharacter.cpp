@@ -29,6 +29,7 @@ AGC_PlayerCharacter::AGC_PlayerCharacter()
 	CameraComponent->bUsePawnControlRotation = false;
 }
 
+
 UAbilitySystemComponent* AGC_PlayerCharacter::GetAbilitySystemComponent() const
 {
 	//get playercharacter own Playerstate,because GC_Playerstate created the ASC,so you need get this first
@@ -38,6 +39,8 @@ UAbilitySystemComponent* AGC_PlayerCharacter::GetAbilitySystemComponent() const
 	return GCPlayerState->GetAbilitySystemComponent();
 }
 
+
+
 void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -45,7 +48,7 @@ void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 	//set InOwnerActor and InAvatarActor by InitAbilityActorInfo function
 	if (!IsValid(GetAbilitySystemComponent()) || !HasAuthority()) return; //HasAuthority() 作用?
 	
-	//为什么这里直接可以getPlayerState,   playerstate是怎么连接到character的??
+	//为什么这里直接可以getPlayerState,playerstate是怎么连接到character的??
 	GetAbilitySystemComponent()->InitAbilityActorInfo(GetPlayerState(),this);
 	
 	//StartupAbilities
@@ -55,7 +58,9 @@ void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 void AGC_PlayerCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
+	
 	if (!IsValid(GetAbilitySystemComponent())) return;
+	
 	GetAbilitySystemComponent()->InitAbilityActorInfo(GetPlayerState(),this);
 }
 
