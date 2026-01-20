@@ -17,10 +17,10 @@ public:
 	void SendEventToEnemy(const TArray<AActor*>& OverlapActors);
 private:
 	UPROPERTY(EditDefaultsOnly,Category="GC|Abilities")
-	float HitBoxRadius = 100.f;
+	float HitBoxRadius = 135.f;
 	
 	UPROPERTY(EditDefaultsOnly,Category="GC|Abilities")
-	float HitBoxForwardOffset = 200.f;
+	float HitBoxForwardOffset = 150.f;
 	
 	UPROPERTY(EditDefaultsOnly,Category="GC|Abilities")
 	float HitBoxElevationOffset = 20.f;

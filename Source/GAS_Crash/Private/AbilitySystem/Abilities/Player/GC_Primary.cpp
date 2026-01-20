@@ -63,6 +63,7 @@ void UGC_Primary::SendEventToEnemy(const TArray<AActor*>& OverlapActors)
 	{
 		if (!IsValid(Actor))continue;
 		
+		//send payload
 		FGameplayEventData payload;
 		payload.Instigator = GetAvatarActorFromActorInfo();
 		
@@ -72,14 +73,14 @@ void UGC_Primary::SendEventToEnemy(const TArray<AActor*>& OverlapActors)
 
 void UGC_Primary::DrawHitBoxOverlap(const FVector& Location, const TArray<FOverlapResult>& OverlapResults) const
 {
-	DrawDebugSphere(GetWorld(),Location,100.f,32,FColor::Blue,false,3.f);
+	DrawDebugSphere(GetWorld(),Location,135.f,32,FColor::Blue,false,3.f);
 		
 	//loop result and draw 
 	for (const FOverlapResult& Result : OverlapResults )
 	{
 		if (IsValid(Result.GetActor())){
 			FVector location = Result.GetActor()->GetActorLocation();
-			DrawDebugSphere(GetWorld(),location+FVector(0,0,100),100.f,32,FColor::Green,false,3.f);
+			DrawDebugSphere(GetWorld(),location+FVector(0,0,100),10.f,32,FColor::Green,false,3.f);
 		}
 	}
 }
