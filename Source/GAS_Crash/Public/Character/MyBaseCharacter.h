@@ -5,6 +5,7 @@
 #include "AbilitySystemInterface.h"
 #include "MyBaseCharacter.generated.h"
 
+class UGameplayEffect;
 class UGameplayAbility;
 class UAbilitySystemComponent;
 
@@ -20,7 +21,13 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 protected:
 	void GiveStartupAbilities();
+	
+	//Apply Effects to CharacterAttribute
+	void InitializeAttribute() const;
 private:
 	UPROPERTY(EditDefaultsOnly,Category="GC|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupGameplayAbilities;
+	
+	UPROPERTY(EditDefaultsOnly,Category="GC|Effects")
+	TSubclassOf<UGameplayEffect> InitializeAttributesEffects;
 };

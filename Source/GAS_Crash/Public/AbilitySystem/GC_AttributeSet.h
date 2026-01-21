@@ -40,12 +40,16 @@ public:
 	//================Hook Function========================
 	
 	// Replicate Server changed Health to client
+	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue) const;
 	
+	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue) const;
 	
+	UFUNCTION()
 	void OnRep_Mana(const FGameplayAttributeData& OldValue) const;
 	
+	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue) const;
 	
 	

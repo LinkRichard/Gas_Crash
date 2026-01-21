@@ -55,6 +55,9 @@ void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 	
 	//StartupAbilities,only server can Give Ability.
 	GiveStartupAbilities();
+	
+	//Initialize Attribute by GE
+	InitializeAttribute();
 }
 
 //Init in Client , client need to know who is avatar and owner,so it can show UI and play animaitons.
