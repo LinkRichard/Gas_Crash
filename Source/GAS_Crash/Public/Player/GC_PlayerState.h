@@ -4,6 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "GC_PlayerState.generated.h"
 
+class UAttributeSet;
 class UAbilitySystemComponent;
 
 UCLASS()
@@ -18,4 +19,7 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere,Category="GC|Abilities")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;
 };

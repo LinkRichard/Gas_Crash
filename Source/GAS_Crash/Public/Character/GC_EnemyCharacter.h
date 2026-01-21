@@ -3,6 +3,7 @@
 #include "MyBaseCharacter.h"
 #include "GC_EnemyCharacter.generated.h"
 
+class UAttributeSet;
 class UAbilitySystemComponent;
 
 UCLASS()
@@ -22,4 +23,6 @@ private:
 	UPROPERTY(EditDefaultsOnly,Category="GC|AbilitySystem")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	 
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributesSet;
 };

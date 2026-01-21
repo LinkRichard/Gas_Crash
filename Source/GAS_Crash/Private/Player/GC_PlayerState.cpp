@@ -1,5 +1,6 @@
 ﻿#include "Player/GC_PlayerState.h"
 #include "AbilitySystem/GC_AbilitySystemComponent.h"
+#include "AbilitySystem/GC_AttributeSet.h"
 
 AGC_PlayerState::AGC_PlayerState()
 {
@@ -12,6 +13,8 @@ AGC_PlayerState::AGC_PlayerState()
 	// set ReplicationMode
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
+	//Create AttributeSet
+	AttributeSet = CreateDefaultSubobject<UGC_AttributeSet>(FName("AttributeSet"));
 }
 
 UAbilitySystemComponent* AGC_PlayerState::GetAbilitySystemComponent() const
