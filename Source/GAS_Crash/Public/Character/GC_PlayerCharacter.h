@@ -16,10 +16,13 @@ public:
 		
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
-	//?
+	//PlayerState初始化接口,ASC注册,赋予初始能力等等,只在服务器执行
 	virtual void PossessedBy(AController* NewController) override;
-	//?
+	
+	//PlayerState Replication 复制接口,只在客户端执行
 	virtual void OnRep_PlayerState() override;
+	
+	virtual UAttributeSet* GetAttributeSet() const override;
 	
 private:
 	UPROPERTY(VisibleAnywhere,Category = "Camera")

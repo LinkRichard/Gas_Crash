@@ -16,6 +16,8 @@ public:
 	
 	//achieve ASInterface , its function is to return ASC
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	UAttributeSet* GetAttributeSet() const;
 private:
 	UPROPERTY(VisibleAnywhere,Category="GC|Abilities")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

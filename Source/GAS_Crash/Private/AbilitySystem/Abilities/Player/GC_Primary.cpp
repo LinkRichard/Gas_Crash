@@ -1,5 +1,5 @@
 ﻿#include "AbilitySystem/Abilities/Player/GC_Primary.h"
-
+#include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Engine/OverlapResult.h"
 #include "GameplayTags/GCTags.h"
@@ -70,6 +70,10 @@ void UGC_Primary::SendEventToEnemy(const TArray<AActor*>& OverlapActors)
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Actor,GCTags::GCEvents::Enemy::HitReact,payload);
 	}
 }
+
+
+
+
 
 void UGC_Primary::DrawHitBoxOverlap(const FVector& Location, const TArray<FOverlapResult>& OverlapResults) const
 {

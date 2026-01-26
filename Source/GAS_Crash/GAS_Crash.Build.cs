@@ -16,7 +16,8 @@ public class GAS_Crash : ModuleRules
 		"EnhancedInput",
 		"GameplayAbilities",
 		"GameplayTags",
-		"GameplayTasks"
+		"GameplayTasks",
+		"UMG"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

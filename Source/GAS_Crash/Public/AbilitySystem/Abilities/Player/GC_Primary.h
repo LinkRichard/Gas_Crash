@@ -13,6 +13,7 @@ public:
 	UFUNCTION(BlueprintCallable,Category="GC|Abilities")
 	TArray<AActor*> HitBoxOverlapTest();
 	
+	// Send GameEvent which included Tag Payload messages to Enemy.
 	UFUNCTION(BlueprintCallable,Category="GC|Abilities")
 	void SendEventToEnemy(const TArray<AActor*>& OverlapActors);
 private:

@@ -9,14 +9,19 @@
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName,PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
-	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName) \
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName) 
 
+//Create Delegate 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAttributeSetInitialized);
 
 UCLASS()
 class GAS_CRASH_API UGC_AttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable)
+	FAttributeSetInitialized OnAttributeSetInitialized;
+	
 	
 	//================Core Attribute=================
 	ATTRIBUTE_ACCESSORS(ThisClass,Health);
@@ -37,6 +42,8 @@ public:
 	UPROPERTY(BlueprintReadOnly,ReplicatedUsing=OnRep_MaxMana)
 	FGameplayAttributeData MaxMana;
 	
+	
+	
 	//================Hook Function========================
 	
 	// Replicate Server changed Health to client
@@ -55,4 +62,16 @@ public:
 	
 	// 复制注册机制,向ue的网络系统注册需要复制的值
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	
+	UPROPERTY(ReplicatedUsing = OnRep_AttributeInitialized)
+	bool bAttributeInitialized = false;
+	
+	UFUNCTION()
+	void OnRep_AttributeInitialized();
+	
+	//
+	virtual void  PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	
+	
 };

@@ -53,6 +53,9 @@ void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 	//Initialize ASC's owner and avatar
 	GetAbilitySystemComponent()->InitAbilityActorInfo(GetPlayerState(),this);
 	
+	//Delegate ASC and AS
+	OnAscInitialized.Broadcast(GetAbilitySystemComponent(),GetAttributeSet());
+	
 	//StartupAbilities,only server can Give Ability.
 	GiveStartupAbilities();
 	
@@ -60,7 +63,7 @@ void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 	InitializeAttribute();
 }
 
-//Init in Client , client need to know who is avatar and owner,so it can show UI and play animaitons.
+//Init in Client , client need to know who is avatar and owner,so it can show UI and play Animations.
 void AGC_PlayerCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -68,6 +71,16 @@ void AGC_PlayerCharacter::OnRep_PlayerState()
 	if (!IsValid(GetAbilitySystemComponent())) return;
 	
 	GetAbilitySystemComponent()->InitAbilityActorInfo(GetPlayerState(),this);
+	
+	OnAscInitialized.Broadcast(GetAbilitySystemComponent(),GetAttributeSet());
+}
+
+UAttributeSet* AGC_PlayerCharacter::GetAttributeSet() const
+{
+	AGC_PlayerState* GC_PlayerState = Cast<AGC_PlayerState>(GetPlayerState());
+	if (!IsValid(GC_PlayerState)) return nullptr;
+	
+	return GC_PlayerState->GetAttributeSet();
 }
 
 
