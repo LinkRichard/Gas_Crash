@@ -47,7 +47,7 @@ TArray<AActor*> UGC_Primary::HitBoxOverlapTest()
 		OverlapActors.AddUnique(result.GetActor());
 	}
 	
-	//.draw debug
+	//draw debug
 	if (bDrawDebugs)
 	{
 		DrawHitBoxOverlap(Location,OverlapResults);
@@ -71,15 +71,16 @@ void UGC_Primary::SendEventToEnemy(const TArray<AActor*>& OverlapActors)
 	}
 }
 
-void UGC_Primary::ApplyDamageEffectToHitResult(const TArray<AActor*>& Actors)  
-{  
-	UAbilitySystemComponent* SourceASC  = GetAbilitySystemComponentFromActorInfo();  
+void UGC_Primary::ApplyDamageEffectToHitResult(const TArray<AActor*>& Actors)
+{
+	UAbilitySystemComponent* SourceASC  = GetAbilitySystemComponentFromActorInfo();
 	if (!IsValid(SourceASC )) return;
 	
+	//Create EffectSpecHandle
 	FGameplayEffectContextHandle ContextHandle = SourceASC->MakeEffectContext();
 	FGameplayEffectSpecHandle EffectSpecHandle= SourceASC->MakeOutgoingSpec(DamageEffect,GetAbilityLevel(),ContextHandle);
-	if (!EffectSpecHandle.IsValid()) return; //这里为什么 isvalid(Spec)不行?
-	
+	if (!EffectSpecHandle.IsValid()) return;
+
 	//Get EffectSpec
 	FGameplayEffectSpec EffectSpec = *EffectSpecHandle.Data.Get();
 	
@@ -93,9 +94,6 @@ void UGC_Primary::ApplyDamageEffectToHitResult(const TArray<AActor*>& Actors)
 		SourceASC->ApplyGameplayEffectSpecToTarget(EffectSpec,TargetASC);
 	}  
 }
-
-
-
 
 void UGC_Primary::DrawHitBoxOverlap(const FVector& Location, const TArray<FOverlapResult>& OverlapResults) const
 {

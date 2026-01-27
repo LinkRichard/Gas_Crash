@@ -42,6 +42,7 @@ void AMyBaseCharacter::InitializeAttribute() const
 	FGameplayEffectContextHandle EffectContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this); //mark,this is created from self
 	
+	//Create EffectSpecHandle
 	FGameplayEffectSpecHandle EffectSpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(
 		InitializeAttributesEffects,
 		1.f,
@@ -56,22 +57,5 @@ void AMyBaseCharacter::InitializeAttribute() const
 	
 	//Apply Effect to Character's Attribute
 	FActiveGameplayEffectHandle ActiveGameplayEffectHandle = GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
-	
-	
-	// 6. 验证逻辑优化
-	if (!ActiveGameplayEffectHandle.IsValid())
-	{
-		// 如果是 Instant GE，这行 Log 会被误触发
-		// 建议：只有当 Duration 不是 Instant 时才进行这个检查
-		if (EffectSpecHandle.Data.Get()->Def->DurationPolicy != EGameplayEffectDurationType::Instant)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Active GE failed to apply (Duration/Infinite) to %s"), *GetName());
-		}
-		else 
-		{
-			// Instant 效果应用成功通常没有返回值，这是正常的
-			UE_LOG(LogTemp, Log, TEXT("Instant GE applied to %s"), *GetName());
-		}
-	}
 }
 

@@ -30,6 +30,7 @@ void UGC_AbilitySystemComponent::OnRep_ActivateAbilities()
 }
 
 
+
 void UGC_AbilitySystemComponent::HandleAutoActivatedAbilities(const FGameplayAbilitySpec& AbilitySpec)
 {
 	if (!IsValid(AbilitySpec.Ability)) return;
@@ -42,5 +43,33 @@ void UGC_AbilitySystemComponent::HandleAutoActivatedAbilities(const FGameplayAbi
 			TryActivateAbility(AbilitySpec.Handle);
 			return;
 		}
+	}
+}
+
+void UGC_AbilitySystemComponent::SetAbilityLevel(TSubclassOf<UGameplayAbility> AbilityClass, int32 Level)
+{
+	//Set Level (about data) must in Server
+	if (IsValid(GetAvatarActor()) && !GetAvatarActor()->HasAuthority()) return;
+	
+	//Get the AbilitySpec
+	FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass);
+	
+	//Set the Ability's Level
+	if (Spec)
+	{
+		Spec->Level = Level;
+		//
+		MarkAbilitySpecDirty(*Spec);
+	}
+}
+
+void UGC_AbilitySystemComponent::IncreaseAbilityLevel(TSubclassOf<UGameplayAbility> AbilityClass, int32 IncreaseLevel)
+{
+	if (IsValid(GetAvatarActor()) && !GetAvatarActor()->HasAuthority()) return;
+	
+	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass))
+	{
+		Spec->Level +=IncreaseLevel;
+		MarkAbilitySpecDirty(*Spec);
 	}
 }
