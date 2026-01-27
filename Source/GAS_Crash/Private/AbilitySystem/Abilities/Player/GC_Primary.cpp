@@ -71,6 +71,28 @@ void UGC_Primary::SendEventToEnemy(const TArray<AActor*>& OverlapActors)
 	}
 }
 
+void UGC_Primary::ApplyDamageEffectToHitResult(const TArray<AActor*>& Actors)  
+{  
+	UAbilitySystemComponent* SourceASC  = GetAbilitySystemComponentFromActorInfo();  
+	if (!IsValid(SourceASC )) return;
+	
+	FGameplayEffectContextHandle ContextHandle = SourceASC->MakeEffectContext();
+	FGameplayEffectSpecHandle EffectSpecHandle= SourceASC->MakeOutgoingSpec(DamageEffect,GetAbilityLevel(),ContextHandle);
+	if (!EffectSpecHandle.IsValid()) return; //这里为什么 isvalid(Spec)不行?
+	
+	//Get EffectSpec
+	FGameplayEffectSpec EffectSpec = *EffectSpecHandle.Data.Get();
+	
+	for (AActor* Actor : Actors)  
+	{       
+		if (!IsValid(Actor)) continue;
+		
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Actor);  
+		if (!IsValid(TargetASC)) continue;  
+		
+		SourceASC->ApplyGameplayEffectSpecToTarget(EffectSpec,TargetASC);
+	}  
+}
 
 
 

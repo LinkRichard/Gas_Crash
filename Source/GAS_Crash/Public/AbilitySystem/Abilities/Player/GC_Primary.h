@@ -26,7 +26,13 @@ private:
 	UPROPERTY(EditDefaultsOnly,Category="GC|Abilities")
 	float HitBoxElevationOffset = 20.f;
 	
+	// DamageEffect
+	UPROPERTY(EditAnywhere,Category="GC|Abilities")
+	TSubclassOf<UGameplayEffect> DamageEffect;
+	
 	void DrawHitBoxOverlap(const FVector& Location,const TArray<FOverlapResult>& OverlapResults) const;
 	
-	
+	//Apply DamageEffect to HitResult  
+	UFUNCTION(BlueprintCallable)  
+	void ApplyDamageEffectToHitResult(const TArray<AActor*>& Actors);
 };
