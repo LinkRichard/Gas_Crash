@@ -1,5 +1,6 @@
 ﻿#include "GAS_Crash/Public/Character/GC_PlayerCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/GC_AttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -61,6 +62,11 @@ void AGC_PlayerCharacter::PossessedBy(AController* NewController)
 	
 	//Initialize Attribute by GE
 	InitializeAttribute();
+	
+	//Subscribe the Delegate Listen the Attribute change.
+	UGC_AttributeSet* GCAS = Cast<UGC_AttributeSet>(GetAttributeSet());
+	if (!GCAS) return;
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(GCAS->GetHealthAttribute()).AddUObject(this,&ThisClass::OnHealthChanged);
 }
 
 //Init in Client , client need to know who is avatar and owner,so it can show UI and play Animations.
@@ -73,6 +79,11 @@ void AGC_PlayerCharacter::OnRep_PlayerState()
 	GetAbilitySystemComponent()->InitAbilityActorInfo(GetPlayerState(),this);
 	
 	OnAscInitialized.Broadcast(GetAbilitySystemComponent(),GetAttributeSet());
+	
+	//Subscribe the Delegate Listen the Attribute change.
+	UGC_AttributeSet* GCAS = Cast<UGC_AttributeSet>(GetAttributeSet());
+	if (!GCAS) return;
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(GCAS->GetHealthAttribute()).AddUObject(this,&ThisClass::OnHealthChanged);
 }
 
 UAttributeSet* AGC_PlayerCharacter::GetAttributeSet() const

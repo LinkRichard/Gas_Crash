@@ -29,6 +29,10 @@ void AGC_EnemyCharacter::BeginPlay()
 	GiveStartupAbilities(); //inherits from MyBaseCharacter
 	InitializeAttribute(); //Initialize Attribute by GE
 	
+	//Subscribe the Delegate Listen the Attribute change.
+	UGC_AttributeSet* GC_AS = Cast<UGC_AttributeSet>(GetAttributeSet());
+	if (!GC_AS ) return;
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(GC_AS->GetHealthAttribute()).AddUObject(this,&ThisClass::OnHealthChanged);
 }
 
 

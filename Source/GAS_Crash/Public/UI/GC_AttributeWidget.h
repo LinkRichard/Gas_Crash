@@ -18,10 +18,12 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GC|Abilities")
 	FGameplayAttribute MaxAttribute;
 	
+	//Check if the Widget is responsible for the Current Pair.
 	bool MatchesAttributes(const TTuple<FGameplayAttribute,FGameplayAttribute>& Pair);
 	
 	void OnAttributesChange(const TTuple<FGameplayAttribute,FGameplayAttribute>& Pair,UGC_AttributeSet* AttributeSet);
-
+	
+	// Update AttributeValue to UI
 	UFUNCTION(BlueprintImplementableEvent,meta=(DisplayName = "On Attributes Change"))
 	void BP_OnAttributesChange(float NewValue,float NewMaxValue);
 };

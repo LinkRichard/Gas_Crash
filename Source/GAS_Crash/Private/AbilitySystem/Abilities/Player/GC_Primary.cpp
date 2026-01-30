@@ -78,6 +78,7 @@ void UGC_Primary::ApplyDamageEffectToHitResult(const TArray<AActor*>& Actors)
 	
 	//Create EffectSpecHandle
 	FGameplayEffectContextHandle ContextHandle = SourceASC->MakeEffectContext();
+	ContextHandle.AddInstigator(GetAbilitySystemComponentFromActorInfo()->GetAvatarActor(),GetAbilitySystemComponentFromActorInfo()->GetAvatarActor());
 	FGameplayEffectSpecHandle EffectSpecHandle= SourceASC->MakeOutgoingSpec(DamageEffect,GetAbilityLevel(),ContextHandle);
 	if (!EffectSpecHandle.IsValid()) return;
 

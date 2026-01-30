@@ -17,6 +17,8 @@ namespace GCTags
 	//EventTag used to Send information
 	namespace GCEvents
 	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(KillScored);
+		
 		namespace Enemy
 		{
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact);

@@ -59,3 +59,37 @@ void AMyBaseCharacter::InitializeAttribute() const
 	FActiveGameplayEffectHandle ActiveGameplayEffectHandle = GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 }
 
+void AMyBaseCharacter::ResetAttributes()
+{
+	if (!HasAuthority()) return;
+	if (!GetAbilitySystemComponent()) return;
+	if (!IsValid(ResetAttributeEffects)) return;
+	
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+	FGameplayEffectSpecHandle EffectSpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(ResetAttributeEffects,1,ContextHandle);
+	
+	if (!EffectSpecHandle.IsValid()) return;
+	
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+}
+
+void AMyBaseCharacter::OnHealthChanged(const FOnAttributeChangeData& AttributeChangeData)
+{
+	if (AttributeChangeData.NewValue <= 0.f)
+	{
+		HandleDeath();
+	}
+}
+
+void AMyBaseCharacter::HandleDeath()
+{
+	bAlive = false;
+	
+}
+
+void AMyBaseCharacter::HandleRespawn()
+{
+	bAlive = true;
+}
+

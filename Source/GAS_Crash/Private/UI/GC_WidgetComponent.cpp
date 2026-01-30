@@ -30,18 +30,6 @@ void UGC_WidgetComponent::InitAbilitySystemData()
 	AbilitySystemComponent = Cast<UGC_AbilitySystemComponent>(BaseCharacter->GetAbilitySystemComponent()); 
 }
 
-void UGC_WidgetComponent::InitAttributeSetDelegate()
-{
-	// if initialize attributeset by GE is failed,Use Delegate
-	if (!AttributeSet->bAttributeInitialized)
-	{
-		AttributeSet->OnAttributeSetInitialized.AddDynamic(this,&ThisClass::CBF_BindToAttributeChanges);
-	}else  // it means init is finished just need to change attribute when in else
-	{
-		CBF_BindToAttributeChanges();
-	}
-}
-
 bool UGC_WidgetComponent::IsASCInitialized() const
 {
 	return AbilitySystemComponent.IsValid() && AttributeSet.IsValid();
@@ -49,7 +37,8 @@ bool UGC_WidgetComponent::IsASCInitialized() const
 
 void UGC_WidgetComponent::CBF_ASCInitialized(UAbilitySystemComponent* ASC, UAttributeSet* AS)
 {
-	AbilitySystemComponent = Cast<UGC_AbilitySystemComponent>(ASC);//这里的参数为啥不是basecharacter->getabilitysystemcomponent()
+	// 参数来源:这些参数由BaseCharacter在ASC初始化完成后通过委托传递 : BaseCharacter->OnAscInitialized.Broadcast(MyASC, MyAS);
+	AbilitySystemComponent = Cast<UGC_AbilitySystemComponent>(ASC);
 	AttributeSet = Cast<UGC_AttributeSet>(AS);
 	
 	//执行到这里,如果上面赋值成功.那么就开始检查并初始属性集  
@@ -58,32 +47,52 @@ void UGC_WidgetComponent::CBF_ASCInitialized(UAbilitySystemComponent* ASC, UAttr
 }
 
 
-void UGC_WidgetComponent::CBF_BindToAttributeChanges()
+void UGC_WidgetComponent::InitAttributeSetDelegate()
+{
+	// Check if the AttributeSet has been fully initialized (by the initial GE).
+	// If false, it means data is pending. We subscribe to the delegate and wait for the signal.
+	if (!AttributeSet->bAttributeInitialized)
+	{
+		AttributeSet->OnAttributeSetInitialized.AddDynamic(this,&ThisClass::CBF_BindAllWidgetAttributesChanges);
+	}else  
+	{
+		// If data is already ready, proceed to bind immediately.
+		CBF_BindAllWidgetAttributesChanges();
+	}   
+}
+
+void UGC_WidgetComponent::CBF_BindAllWidgetAttributesChanges()
 {
 	for (const TTuple<FGameplayAttribute,FGameplayAttribute>& Pair : AttributeMap)
 	{
-		BindWidgetToAttributeChanges(GetUserWidgetObject(),Pair);
+		//check the Root Widget first
+		//check the Root is container or Single functional Widget
+		BindSingleWidgetToAttributeChanges(GetUserWidgetObject(),Pair);
 		
-		GetUserWidgetObject()->WidgetTree->ForEachWidget([this,&Pair](UWidget* ChildWidget)
+		// Iterate through all childWidget in the tree 
+		//WidgetTree->ForEachWidget does not include Root Widget.
+		GetUserWidgetObject()->WidgetTree->ForEachWidget([this,Pair](UWidget* ChildWidget)
 		{
-			BindWidgetToAttributeChanges(ChildWidget,Pair);		
+			BindSingleWidgetToAttributeChanges(ChildWidget,Pair);		
 		});
 	}
 }
 
-void UGC_WidgetComponent::BindWidgetToAttributeChanges(UWidget* WidgetObject,
+void UGC_WidgetComponent::BindSingleWidgetToAttributeChanges(UWidget* WidgetObject,
 	const TTuple<FGameplayAttribute, FGameplayAttribute>& Pair)
 {
 	UGC_AttributeWidget* AttributeWidget = Cast<UGC_AttributeWidget>(WidgetObject);
-	if (!IsValid(AttributeWidget)) return; // only care GC Attribute Widgets
+	if (!IsValid(AttributeWidget)) return;
 	if (!AttributeWidget->MatchesAttributes(Pair)) return; 
 	
-	AttributeWidget->OnAttributesChange(Pair,AttributeSet.Get()); //Initialize
+	//Step1: Push the initial value ensure the UI is correct before any changes occured
+	AttributeWidget->OnAttributesChange(Pair,AttributeSet.Get());
 	
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Key).AddLambda([this,AttributeWidget,&Pair](const FOnAttributeChangeData& AttributeChangeData){
-		AttributeWidget->OnAttributesChange(Pair,AttributeSet.Get());
-	});
+	//Step2: Subscribe ASC->Delegate to Update AttributeValue in AttributeWidget when AttributeData changed.
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Key).AddLambda(
+		[this,AttributeWidget,Pair]
+		(const FOnAttributeChangeData& AttributeChangeData)
+		{AttributeWidget->OnAttributesChange(Pair,AttributeSet.Get());}
+		);
 }
-
-//犯错:直接GetOwner(),BaseCharacter->GetAttribute()忘记Cast<>()了
 
