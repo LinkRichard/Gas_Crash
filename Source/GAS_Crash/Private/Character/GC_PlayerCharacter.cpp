@@ -28,6 +28,9 @@ AGC_PlayerCharacter::AGC_PlayerCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent,USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
+	
+	//Add Tag
+	Tags.Add(CrashTags::Player);
 }
 
 

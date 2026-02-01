@@ -17,6 +17,20 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual UAttributeSet* GetAttributeSet() const override;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GC|AI")
+	float AcceptanceRadius = 500.f;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GC|AI")
+	float MinAttackDelay = .1f;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GC|AI")
+	float MaxAttackDelay = .5f;
+
+	//获取随机攻击延迟 [Min, Max]
+	UFUNCTION(BlueprintCallable, Category="GC|AI", meta=(CompactNodeTitle="Random Delay"))
+	float GetRandomAttackDelay() const;
+
 protected:
 	virtual void BeginPlay() override;
 

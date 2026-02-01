@@ -47,3 +47,8 @@ UAttributeSet* AGC_EnemyCharacter::GetAttributeSet() const
 	return AttributesSet;
 }
 
+float AGC_EnemyCharacter::GetRandomAttackDelay() const
+{
+	return FMath::FRandRange(MinAttackDelay, MaxAttackDelay);
+}
+
