@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 #include "MyBaseCharacter.h"
+#include "GameplayTagContainer.h"
+#include "GameplayAbilitySpec.h"
 #include "GC_EnemyCharacter.generated.h"
 
 class UAttributeSet;
@@ -28,9 +30,23 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GC|AI")
 	float MaxAttackDelay = .5f;
 
-	//获取随机攻击延迟 [Min, Max]
+	//GET Random Attack Delay [Min, Max]
 	UFUNCTION(BlueprintCallable, Category="GC|AI", meta=(CompactNodeTitle="Random Delay"))
 	float GetRandomAttackDelay() const;
+	
+	//====================Ability Query API====================
+	
+	//Check Ability is Ready by Tag
+	UFUNCTION(BlueprintPure, Category="GC|Ability")
+	bool IsAbilityReady(const FGameplayTag& AbilityTag) const;
+    
+	//Try to Activate Ability by Tag
+	UFUNCTION(BlueprintCallable, Category="GC|Ability")
+	bool TryActivateAbilityByTag(const FGameplayTag& AbilityTag);
+    
+	//Check any ability is ready
+	UFUNCTION(BlueprintPure, Category="GC|Ability")
+	bool HasAnyAbilityReady(const FGameplayTagContainer& AbilityTags);
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,9 +59,18 @@ private:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributesSet;
 
-	//感知组件（用于检测玩家）
+	//SensingComponent used to sensing player
 	UPROPERTY(VisibleAnywhere, Category="GC|AI")
 	TObjectPtr<UPawnSensingComponent> PawnSensingComponent;
+	
+	// ================Cache Ability============
+	
+	// AbilityHandle Cache(Tag -> SpecHandle Mapping) used to search quickly 
+	UPROPERTY()
+	TMap<FGameplayTag,FGameplayAbilitySpecHandle>  AbilityHandleCache;
+	
+	//Build Ability Cache , called after Given ability
+	void BuildAbilityCache();
 	
 	//Callback Function when PawnSensing sees a pawn
 	UFUNCTION()
