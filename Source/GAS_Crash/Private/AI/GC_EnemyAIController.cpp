@@ -1,10 +1,35 @@
 ﻿#include "AI/GC_EnemyAIController.h"
+#include "AI/GC_AITypeDefs.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/GC_EnemyCharacter.h"
+#include "Character/GC_PlayerCharacter.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
 
 AGC_EnemyAIController::AGC_EnemyAIController()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("AIPerceptionComponent"));
+	SetPerceptionComponent(*PerceptionComponent);
+	
+	//Configure Sight Sense
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
+	SightConfig->SightRadius = 1000.0f;
+	SightConfig->LoseSightRadius = 1200.0f;
+	SightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	SightConfig->SetMaxAge(2.0f);
+	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	
+	//Add and Configure Sense
+	PerceptionComponent->ConfigureSense(*SightConfig);
+	//Set Dominant Sense, usually for sight-based AI
+	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
+	//Bind Delegate to update Target
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this,&ThisClass::HandleTargetPerceptionUpdated);
 }
 
 void AGC_EnemyAIController::BeginPlay()
@@ -26,5 +51,31 @@ void AGC_EnemyAIController::OnPossess(APawn* InPawn)
 	if (BehaviorTree)
 	{
 		RunBehaviorTree(BehaviorTree);
+	}
+}
+
+void AGC_EnemyAIController::HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	//check
+	if (!Actor || Actor == GetPawn()) return;
+
+	AGC_PlayerCharacter* PlayerCharacter = Cast<AGC_PlayerCharacter>(Actor);
+	if (!PlayerCharacter || !PlayerCharacter->IsAlive()) return;
+
+	UBlackboardComponent* BB = GetBlackboardComponent();
+	if (!BB) return;
+
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		BB->SetValueAsObject(BBKeys::TargetActor, PlayerCharacter);
+	}
+	else
+	{
+		// Only clear if the lost target is the current target
+		const UObject* CurrentTarget = BB->GetValueAsObject(BBKeys::TargetActor);
+		if (CurrentTarget == Actor)
+		{
+			BB->ClearValue(BBKeys::TargetActor);
+		}
 	}
 }

@@ -7,7 +7,6 @@
 
 class UAttributeSet;
 class UAbilitySystemComponent;
-class UPawnSensingComponent;
 
 UCLASS()
 class GAS_CRASH_API AGC_EnemyCharacter : public AMyBaseCharacter
@@ -61,10 +60,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributesSet;
-
-	//SensingComponent used to sensing player
-	UPROPERTY(VisibleAnywhere, Category="GC|AI")
-	TObjectPtr<UPawnSensingComponent> PawnSensingComponent;
 	
 	// ================Cache Ability============
 	
@@ -74,8 +69,4 @@ private:
 	
 	//Build Ability Cache , called after Given ability
 	void BuildAbilityCache();
-	
-	//Callback Function when PawnSensing sees a pawn
-	UFUNCTION()
-	void OnSeePawn(APawn* SeenPawn);
 };

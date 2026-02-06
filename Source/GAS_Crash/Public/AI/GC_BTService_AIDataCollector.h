@@ -2,33 +2,24 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTService.h"
-#include "GameplayTagContainer.h"
 #include "GC_BTService_AIDataCollector.generated.h"
-
-
-
-/**
- * AI数据采集服务（重构版）
- * 
- * 架构原则：
- * ❌ 不应该：做决策、改变AI状态、执行行为
- * ✅ 应该：查询数据、更新Blackboard、提供决策依据
- * 
- * 职责边界：
- * - 查询战斗数据（距离、血量、技能CD）
- * - 更新Blackboard键值
- * - 不参与状态决策（由BehaviorTree的Selector和Decorator负责）
- * 
- * 性能优化：
- * - 使用EnemyCharacter的缓存接口，避免遍历
- * - 可配置更新频率（Interval）
- * - 只更新必要的键值
- */
 
 /*
  * AI Data Collect Service
  * 
- * 
+ * Architectural Principles:
+ * - Should Not: Make decisions, change AI state, execute actions
+ * - Should: Query data, update Blackboard, provide decision basis
+
+ * Responsibilities:
+ * - Query combat data (distance, health, ability cooldowns)
+ * - Update Blackboard key values
+ * - Do not participate in state decisions (handled by BehaviorTree's Selector and Decorators)
+
+ * Performance Optimizations:
+ * - Use EnemyCharacter's cached interfaces to avoid iteration
+ * - Configurable update frequency (Interval)
+ * - Only update necessary key values
  */
 
 UCLASS()
@@ -48,10 +39,6 @@ protected:
 	UPROPERTY(EditAnywhere,Category="GC|Blackboard")
 	FBlackboardKeySelector TargetActorKey;
 	
-	//Distance to Target
-	UPROPERTY(EditAnywhere,Category="GC|Blackboard")
-	FBlackboardKeySelector DistanceToTargetKey;
-	
 	//Can Attack
 	UPROPERTY(EditAnywhere, Category="GC|Blackboard")
 	FBlackboardKeySelector bCanAttackKey;
@@ -61,9 +48,10 @@ protected:
 	
 	//Enable Distance Check
 	UPROPERTY(EditAnywhere,Category="GC|Config")
-	bool bEnableDistanceCheck;
+	bool bEnableDistanceCheck = true;
 	
 private:
+	//Update Distance Data, calculates and updates distance to target,check if it can attack
 	void UpdateDistanceData(class UBlackboardComponent* BB,class AGC_EnemyCharacter* EnemyCharacter,AActor* Target);
 	
 };

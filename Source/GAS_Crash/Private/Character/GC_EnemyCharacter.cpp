@@ -1,11 +1,6 @@
 ﻿#include "Character/GC_EnemyCharacter.h"
 #include "AbilitySystem/GC_AbilitySystemComponent.h"
 #include "AbilitySystem/GC_AttributeSet.h"
-#include "Perception/PawnSensingComponent.h"
-#include "AIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "Character/GC_PlayerCharacter.h"
-#include "AI/GC_AITypeDefs.h"
 
 AGC_EnemyCharacter::AGC_EnemyCharacter()
 {
@@ -19,10 +14,6 @@ AGC_EnemyCharacter::AGC_EnemyCharacter()
 	//Create AttributeSet
 	AttributesSet = CreateDefaultSubobject<UGC_AttributeSet>(FName("AttributeSet"));
 
-	//Create PawnSensing Component
-	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
-	PawnSensingComponent->SightRadius = 1000.f;
-	PawnSensingComponent->SetPeripheralVisionAngle(90.f);
 }
 
 void AGC_EnemyCharacter::BeginPlay()
@@ -46,13 +37,7 @@ void AGC_EnemyCharacter::BeginPlay()
 	UGC_AttributeSet* GC_AS = Cast<UGC_AttributeSet>(GetAttributeSet());
 	if (!GC_AS ) return;
 	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(GC_AS->GetHealthAttribute()).AddUObject(this,&ThisClass::OnHealthChanged);
-
-	//Subscribe Delegates from PawnSensingComponent,Bind Callback Functions
-	if (PawnSensingComponent)
-	{
-		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AGC_EnemyCharacter::OnSeePawn);
-	}
-	
+		
 	//Build Ability Cache
 	BuildAbilityCache();
 	
@@ -73,25 +58,6 @@ float AGC_EnemyCharacter::GetRandomAttackDelay() const
 	return FMath::FRandRange(MinAttackDelay, MaxAttackDelay);
 }
 
-void AGC_EnemyCharacter::OnSeePawn(APawn* SeenPawn)
-{
-	//only follow player,not other enemy.
-	if (!SeenPawn || SeenPawn == this) return;
-
-	AGC_PlayerCharacter* Player = Cast<AGC_PlayerCharacter>(SeenPawn);
-	if (!Player) return;
-
-	//Get AIController and BlackBoard
-	AAIController* AIController = Cast<AAIController>(GetController());
-	if (!AIController) return;
-
-	UBlackboardComponent* Blackboard = AIController->GetBlackboardComponent();
-	if (!Blackboard) return;
-
-	//Set TargetToFollow in BlackBoard
-	Blackboard->SetValueAsObject(BBKeys::TargetActor,Player);
-	
-}
 
 void AGC_EnemyCharacter::BuildAbilityCache()
 {
@@ -136,17 +102,17 @@ bool AGC_EnemyCharacter::IsAbilityReady(const FGameplayTag& AbilityTag) const
 	const FGameplayAbilityActorInfo* ActorInfo = AbilitySystemComponent->AbilityActorInfo.Get();
 	if (!ActorInfo) return false;
 	
-	// 核心：CanActivateAbility 会帮你检查：
-	// - Cooldown (基于 CD GE)
-	// - Cost (基于 Cost GE)
-	// - Tags (基于 Ability 的 Cancel/Block 机制)
+	//Core: CanActivateAbility checks:
+	//- Cooldown (based on CD GE)
+	//- Cost (based on Cost GE)
+	//- Tags (based on Ability's Cancel/Block mechanism)
 	return AbilitySpec->Ability->CanActivateAbility(*FoundHandlePtr, ActorInfo);
 }
 
 bool AGC_EnemyCharacter::TryActivateAbilityByTag(const FGameplayTag& AbilityTag)
 {
 	if(!AbilitySystemComponent) return false;
-	//Find Ability Handle from Cache(Tag -> Handle) O(1) complexity
+	//1.Find Ability Handle from Cache(Tag -> Handle) O(1) complexity
 	const FGameplayAbilitySpecHandle* SpecHandle = AbilityHandleCache.Find(AbilityTag);
 	if (!SpecHandle)
 	{
@@ -154,7 +120,7 @@ bool AGC_EnemyCharacter::TryActivateAbilityByTag(const FGameplayTag& AbilityTag)
 		return false;
 	}
 	
-	// 2. 深度预检 (包含了 CD, Cost, 和状态阻挡)
+	// 2. Deep Pre-check(includes CD,Cost and State Block)
 	if (!IsAbilityReady(AbilityTag)) 
 	{
 		return false; 
