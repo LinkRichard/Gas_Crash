@@ -5,10 +5,9 @@
 #include "AbilitySystemInterface.h"
 #include "MyBaseCharacter.generated.h"
 
-//定义标签....
+//Define Tags
 namespace CrashTags
 {
-	//这个extern GAS_CRASH_API啥意思.
 	extern GAS_CRASH_API const FName Player;
 }
 

@@ -9,6 +9,7 @@ namespace GCTags
 	namespace SetByCaller
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Projectile)
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Melee)
 	}
 	
 	//AbilityTag used to activate abilities
@@ -35,7 +36,6 @@ namespace GCTags
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact);
 		}
 	}
-
 	// State Tag used to mark current state.
 	namespace State
 	{

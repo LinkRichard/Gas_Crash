@@ -5,6 +5,7 @@ namespace GCTags
 	namespace SetByCaller
 	{
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Projectile,"GCTags.SetByCaller.Projectile","Tag for Set by Caller magnitude for Projectile");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Melee,"GCTags.SetByCaller.Melee","Tag for SetByCaller magnitude for melee damage");
 	}
 	namespace GCAbilities
 	{
