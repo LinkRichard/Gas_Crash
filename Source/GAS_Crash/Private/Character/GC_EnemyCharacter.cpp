@@ -47,7 +47,7 @@ void AGC_EnemyCharacter::BeginPlay()
 	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(GC_AS->GetHealthAttribute()).AddUObject(this,&ThisClass::OnHealthChanged);
 	
 	//Listen Dead Tag change by delegate
-	GetAbilitySystemComponent()->RegisterGameplayTagEvent(GCTags::State::Dead,EGameplayTagEventType::NewOrRemoved).AddUObject(this,&AGC_EnemyCharacter::OnDeadTagChanged);
+	GetAbilitySystemComponent()->RegisterGameplayTagEvent(GCTags::GCEvents::Enemy::Dead,EGameplayTagEventType::NewOrRemoved).AddUObject(this,&AGC_EnemyCharacter::OnDeadTagChanged);
 }
 
 void AGC_EnemyCharacter::HandleDeath()
@@ -94,8 +94,9 @@ void AGC_EnemyCharacter::Handle_DeathAbilityAndDeathEffect()
 				ActivateDeathEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			}
 		}
+		
 		// Activate DeathAbility to play Montage.
-		ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(GCTags::GCAbilities::Death));
+		ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(GCTags::GCAbilities::Enemy::Death));
 	}
 }
 
@@ -156,7 +157,7 @@ void AGC_EnemyCharacter::SetRespawnTransform(const FTransform& InTransform)
 
 void AGC_EnemyCharacter::OnDeadTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
-	const bool bIsDead = NewCount>0; //NewCount
+	const bool bIsDead = NewCount>0;
 	// bAlive driven by replicated Tag    
 	SetAlive(!bIsDead);
 	

@@ -83,16 +83,16 @@ void AGC_PlayerController::Look(const FInputActionValue& value)
 
 void AGC_PlayerController::Primary()
 {
-	ActivateAbility(GCTags::GCAbilities::Primary);
+	ActivateAbility(GCTags::GCAbilities::player::Primary);
 }
 
 void AGC_PlayerController::Secondary(){
-	ActivateAbility(GCTags::GCAbilities::Secondary);
+	ActivateAbility(GCTags::GCAbilities::player::Secondary);
 }
 
 void AGC_PlayerController::Tertiary()
 {
-	ActivateAbility(GCTags::GCAbilities::Tertiary);
+	ActivateAbility(GCTags::GCAbilities::player::Tertiary);
 }
 
 

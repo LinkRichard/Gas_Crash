@@ -15,30 +15,39 @@ namespace GCTags
 	//AbilityTag used to activate abilities
 	namespace GCAbilities
 	{
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Primary);
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Secondary);
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tertiary);
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(ActivateOnGiven);
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Death);
+		namespace player
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Primary);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Secondary);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tertiary);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Death);
+		}
 		namespace Enemy
 		{
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Respawn);
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Death);
 		}
+
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(ActivateOnGiven);
 	}
 	//EventTag used to Send information
 	namespace GCEvents
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(KillScored);
 		
+		namespace player
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Dead);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(PrimaryAttack);
+		}
+
 		namespace Enemy
 		{
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(HitReact);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Dead);
 		}
 	}
-	// State Tag used to mark current state.
-	namespace State
-	{
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Dead);
-	}
+
 }
