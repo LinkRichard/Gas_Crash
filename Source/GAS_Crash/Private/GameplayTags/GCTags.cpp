@@ -52,4 +52,10 @@ namespace GCTags
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Player, "GCTags.GCIdentity.Player", "Tag to identify player characters.");
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Enemy, "GCTags.GCIdentity.Enemy", "Tag to identify enemy characters.");
 	}
+
+	namespace GameplayCue
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Character_DamageTaken_Melee, "GameplayCue.Character.DamageTaken.Melee", "GameplayCue tag for melee damage taken.");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Character_DamageTaken_Projectile, "GameplayCue.Character.DamageTaken.Projectile", "GameplayCue tag for projectile damage taken.");
+	}
 }

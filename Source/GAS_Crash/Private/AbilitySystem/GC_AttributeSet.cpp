@@ -4,7 +4,6 @@
 #include "GameplayTags/GCTags.h"
 #include "Net/UnrealNetwork.h"
 
-
 void UGC_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue) const
 {
 	//时机: 仅在客户端触发,当服务器复制到客户端的值,也就是下面参数Health,与本地预测的值OldValue不一样时触发
@@ -63,7 +62,36 @@ void UGC_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 			//only care player and make sure health is still above 0,only trigger hit react when player is still alive.
 			if (IsValid(TargetASC) && TargetASC->HasMatchingGameplayTag(GCTags::GCIdentity::Player) && GetHealth()>0.f)
 			{
-				//Send GameplayEvent to trigger hit react and pass HitReactPayload to the receiver,
+				
+				//1.
+				const float MeleeSetByCaller = Data.EffectSpec.GetSetByCallerMagnitude(GCTags::SetByCaller::Melee,false,0);
+				
+				if (!FMath::IsNearlyZero(MeleeSetByCaller))
+				{
+					FGameplayCueParameters GameplayCueParameters(Data.EffectSpec.GetEffectContext());
+					GameplayCueParameters.RawMagnitude = FMath::Abs(HealthDelta);
+					GameplayCueParameters.Instigator = InstigatorActor;
+					
+					GameplayCueParameters.Location = TargetActor->GetActorLocation();
+					GameplayCueParameters.Normal = TargetActor->GetActorForwardVector();
+					
+					if (const FHitResult* HitResult = Data.EffectSpec.GetEffectContext().GetHitResult())
+					{
+						GameplayCueParameters.Location = HitResult->ImpactPoint.IsNearlyZero()
+						? HitResult->Location
+						: HitResult->ImpactPoint;
+						
+						GameplayCueParameters.Normal = HitResult->ImpactNormal.IsNearlyZero()
+						? HitResult->Normal
+						: HitResult->ImpactNormal;
+						
+						GameplayCueParameters.PhysicalMaterial = HitResult->PhysMaterial.Get();
+					}
+					
+					TargetASC->ExecuteGameplayCue(GCTags::GameplayCue::Character_DamageTaken_Melee,GameplayCueParameters);
+				}
+				
+				//2.Send GameplayEvent to trigger hit react and pass HitReactPayload to the receiver,
 				//the receiver can use the payload to do some logic, for example, play different hit react montage based on the instigator or the damage causer.
 				FGameplayEventData HitReactPayload;
 				

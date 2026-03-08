@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "GameplayTagContainer.h"
@@ -12,6 +11,7 @@ class USkeletalMeshComponent;
 class UWorld;
 class AActor;
 struct FAnimNotifyEventReference;
+struct FHitResult;
 
 UCLASS()
 class GAS_CRASH_API UAN_MeleeAttack : public UAnimNotifyState
@@ -33,7 +33,6 @@ public:
 	//Get the name of the notify for display in the editor
 	virtual FString GetNotifyName_Implementation() const override;
 private:
-	
 	struct FMeleeRuntimeData
 	{
 		TSet<TWeakObjectPtr<AActor>> HitActorsInCurrentWindow;
@@ -82,11 +81,11 @@ private:
 	//Perform the trace and apply damage to candidate targets.
 	void ProcessTraceAndApplyDamage(USkeletalMeshComponent* MeshComp, AActor* OwnerActor, UAbilitySystemComponent* SourceASC, FMeleeRuntimeData& RuntimeData);
 	
-	//Perform a single sweep segment and collect hit actors into OutActors.
-	void SweepSegment(USkeletalMeshComponent* MeshComp, AActor* OwnerActor, const FVector& Start, const FVector& End, TSet<TWeakObjectPtr<AActor>>& OutActors) const;
+	//Perform a single sweep segment and collect hit results into OutHitResults.
+	void SweepSegment(USkeletalMeshComponent* MeshComp, AActor* OwnerActor, const FVector& Start, const FVector& End, TArray<FHitResult>& OutHitResults) const;
 	
 	//Apply damage effect to TargetActor
-	void ApplyDamageToTarget(AActor* SourceActor, UAbilitySystemComponent* SourceASC, AActor* TargetActor) const;
+	void ApplyDamageToTarget(AActor* SourceActor, UAbilitySystemComponent* SourceASC, AActor* TargetActor,const FHitResult& HitResult) const;
 	
 	//Resolve the SetByCaller tag to use for this attack, fallback to default if not set.
 	FGameplayTag ResolveDamageSetByCallerTag() const;

@@ -57,4 +57,9 @@ namespace GCTags
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy);
 	}
 
+	namespace GameplayCue
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_DamageTaken_Melee);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_DamageTaken_Projectile);
+	}
 }

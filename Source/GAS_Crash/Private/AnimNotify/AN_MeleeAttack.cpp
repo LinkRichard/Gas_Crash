@@ -103,15 +103,15 @@ void UAN_MeleeAttack::ProcessTraceAndApplyDamage(USkeletalMeshComponent* MeshCom
 	const FVector CurrentSocketStart = GetSocketLocationSafe(MeshComp,TraceStartSocketName,FallbackLocation);
 	const FVector CurrentSocketEnd = GetSocketLocationSafe(MeshComp,TraceEndSocketName,FallbackLocation);
 	
-	TSet<TWeakObjectPtr<AActor>> HitActorsThisTick;
+	TArray<FHitResult> HitResultsThisTick;
 	
-	//Perform a single sweep segment and collect hit actors into OutActors.
-	SweepSegment(MeshComp,OwnerActor,CurrentSocketStart,CurrentSocketEnd,HitActorsThisTick);
+	//Perform a single sweep segment and collect HitResults.
+	SweepSegment(MeshComp,OwnerActor,CurrentSocketStart,CurrentSocketEnd,HitResultsThisTick);
 
-	//Iterate over hit actors, filter and apply damage.
-	for (const TWeakObjectPtr<AActor>& WeakTargetActor : HitActorsThisTick)
+	//Iterate over hit results, filter and apply damage.
+	for (const FHitResult& HitResult : HitResultsThisTick)
 	{
-		AActor*	TargetActor = WeakTargetActor.Get();
+		AActor*	TargetActor = HitResult.GetActor();
 		if (!IsEligibleDamageTarget(OwnerActor,TargetActor))
 		{
 			continue;
@@ -122,13 +122,13 @@ void UAN_MeleeAttack::ProcessTraceAndApplyDamage(USkeletalMeshComponent* MeshCom
 			continue;
 		}
 		
-		ApplyDamageToTarget(OwnerActor,SourceASC,TargetActor);
+		ApplyDamageToTarget(OwnerActor,SourceASC,TargetActor,HitResult);
 		RuntimeData.HitActorsInCurrentWindow.Add(TargetActor);
 	}
 }
 
 void UAN_MeleeAttack::SweepSegment(USkeletalMeshComponent* MeshComp, AActor* OwnerActor, const FVector& Start,
-	const FVector& End, TSet<TWeakObjectPtr<AActor>>& OutActors) const
+	const FVector& End, TArray<FHitResult>& OutHitResults) const
 {
 	if (!IsValid(OwnerActor) || !IsValid(MeshComp)) return;
 	
@@ -138,9 +138,8 @@ void UAN_MeleeAttack::SweepSegment(USkeletalMeshComponent* MeshComp, AActor* Own
 	FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(AN_MeleeAttack),false,OwnerActor);
 	QueryParams.AddIgnoredActor(OwnerActor);
 	
-	TArray<FHitResult> HitResults;
 	const bool bHit = World->SweepMultiByChannel(
-		HitResults,
+		OutHitResults,
 		Start,
 		End,
 		FQuat::Identity,
@@ -151,18 +150,6 @@ void UAN_MeleeAttack::SweepSegment(USkeletalMeshComponent* MeshComp, AActor* Own
 	if (bDrawDebug)
 	{
 		DrawDebugSweep(World,Start,End,bHit ? FColor::Red : FColor::Green);
-	}
-	
-	if (!bHit) return;
-	
-	for (FHitResult& HitResult : HitResults)
-	{
-		AActor* HitActor = HitResult.GetActor();
-		
-		if (IsValid(HitActor) && HitActor != OwnerActor)
-		{
-			OutActors.Add(HitActor);
-		}
 	}
 }
 
@@ -184,7 +171,7 @@ bool UAN_MeleeAttack::IsEligibleDamageTarget(AActor* OwnerActor, AActor* Candida
 }
 
 void UAN_MeleeAttack::ApplyDamageToTarget(AActor* SourceActor, UAbilitySystemComponent* SourceASC,
-	AActor* TargetActor) const
+	AActor* TargetActor ,const FHitResult& HitResult) const
 {
 	if (!IsValid(SourceActor) || !IsValid(SourceASC) || !IsValid(TargetActor) || !DamageEffect) return;
 	
@@ -194,6 +181,8 @@ void UAN_MeleeAttack::ApplyDamageToTarget(AActor* SourceActor, UAbilitySystemCom
 	FGameplayEffectContextHandle ContextHandle = SourceASC->MakeEffectContext();
 	ContextHandle.AddInstigator(SourceActor,SourceActor);
 	ContextHandle.AddSourceObject(SourceActor);
+	//
+	ContextHandle.AddHitResult(HitResult,true);
 	
 	FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffect,1,ContextHandle);
 	if (!EffectSpecHandle.IsValid()) return;
