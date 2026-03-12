@@ -25,7 +25,7 @@ public:
 	virtual UAttributeSet* GetAttributeSet() const override;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GC|AI")
-	float AttackRadius = 900;
+	float AttackRadius = 800;
 	
 	//====================Death Event====================
 	
